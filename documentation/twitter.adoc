@@ -1,0 +1,239 @@
+== Twitter Graph
+
+Show data from your personal Twitter account
+
+_The Graph Your Network_ application inserts your Twitter activity into
+Neo4j.
+
+Here is a data model of the
+graph:image://neo4jsandbox.com/guides/twitter/img/twitter-data-model.svg[image]
+
+image:https://guides.neo4j.com/sandbox/twitter/images/click-next.png[image]
+
+== Twitter Graph
+
+Show data from your personal Twitter account
+
+_The Graph Your Network_ application inserts your Twitter activity into
+Neo4j.
+
+This application allows you to query things like:
+
+. Who's mentioning you on Twitter
+. Who are your most influential followers?
+. What tags you use frequently
+. How many people you follow also follow you back
+. People tweeting about you, but you don't follow
+. Links from intresting retweets
+. Other people tweeting with some of your top hashtags
+
+== Twitter Graph
+
+== Your mentions
+
+To the right is a giant code block containing a single Cypher query
+statement to determine who's mentioning you on Twitter.
+
+. Click on the code blocks
+. Notice they get copied to the editor above ↑
+. Click the editor's play button to execute
+. Wait for the query to finish
+
+== Graph of some of your mentions
+
+[source,pre-scrollable,code,runnable]
+----
+// Graph of some of your mentions
+MATCH
+  (u:Me:User)-[p:POSTS]->(t:Tweet)-[:MENTIONS]->(m:User)
+WITH
+  u,p,t,m, COUNT(m.screen_name) AS count
+ORDER BY 
+  count DESC
+RETURN
+  u,p,t,m
+LIMIT 10
+----
+
+== Details as a table
+
+[source,pre-scrollable,code,runnable]
+----
+// Detailed table of some of your mentions
+MATCH
+  (u:User:Me)-[:POSTS]->(t:Tweet)-[:MENTIONS]->(m:User)
+RETURN
+  m.screen_name AS screen_name, COUNT(m.screen_name) AS count 
+ORDER BY 
+  count DESC
+LIMIT 10
+----
+
+== Twitter Graph
+
+== Most Influential Followers
+
+Who are your most influential followers?
+
+. Click on the code block
+. Notice it gets copied to the editor above ↑
+. Click the editor's play button to execute
+. Wait for the query to finish
+
+[source,pre-scrollable,code,runnable]
+----
+// Most influential followers
+MATCH 
+  (follower:User)-[:FOLLOWS]->(u:User:Me)
+RETURN 
+  follower.screen_name AS user, follower.followers AS followers
+ORDER BY
+  followers DESC
+LIMIT 10
+----
+
+== Twitter Graph
+
+== Most Tagged
+
+What hashtags have you used most often?
+
+. Click on the code block
+. Notice it gets copied to the editor above ↑
+. Click the editor's play button to execute
+. Wait for the query to finish
+
+[source,pre-scrollable,code,runnable]
+----
+// The hashtags you have used most often
+MATCH
+  (h:Hashtag)<-[:TAGS]-(t:Tweet)<-[:POSTS]-(u:User:Me)
+WITH 
+  h, COUNT(h) AS Hashtags
+ORDER BY 
+  Hashtags DESC
+LIMIT 10
+RETURN 
+  h.name, Hashtags
+----
+
+== Twitter Graph
+
+== Followback Rate
+
+At what rate do people you follow also follow you back?
+
+. Click on the code block
+. Notice it gets copied to the editor above ↑
+. Click the editor's play button to execute
+. Wait for the query to finish
+
+[source,pre-scrollable,code,runnable]
+----
+// Followback rate
+MATCH 
+  (me:User:Me)-[:FOLLOWS]->(f)
+WITH 
+  me, f, size((f)-[:FOLLOWS]->(me)) as doesFollowBack
+RETURN
+  SUM(doesFollowBack) / toFloat(COUNT(f))  AS followBackRate
+----
+
+== Twitter Graph
+
+== Follower Recommendations
+
+Who tweets about you, but you do not follow?
+
+. Click on the code block
+. Notice it gets copied to the editor above ↑
+. Click the editor's play button to execute
+. Wait for the query to finish
+
+[source,pre-scrollable,code,runnable]
+----
+// Follower Recommendations - tweeting about you, but you don't follow
+MATCH 
+  (ou:User)-[:POSTS]->(t:Tweet)-[mt:MENTIONS]->(me:User:Me)
+WITH 
+  DISTINCT ou, me
+WHERE
+  (ou)-[:FOLLOWS]->(me)
+  AND NOT 
+    (me)-[:FOLLOWS]->(ou)
+RETURN 
+  ou.screen_name
+----
+
+== Twitter Graph
+
+== Links from interesting retweets
+
+What links do you retweet, and how often are they favorited?
+
+. Click on the code block
+. Notice it gets copied to the editor above ↑
+. Click the editor's play button to execute
+. Wait for the query to finish
+
+[source,pre-scrollable,code,runnable]
+----
+// Links from interesting retweets
+MATCH
+  (:User:Me)-[:POSTS]->
+  (t:Tweet)-[:RETWEETS]->(rt)-[:CONTAINS]->(link:Link)
+RETURN
+  t.id_str AS tweet, link.url AS url, rt.favorites AS favorites
+ORDER BY
+  favorites DESC
+LIMIT 10
+----
+
+== Twitter Graph
+
+== Common Hashtags
+
+What users tweet with some of your top hashtags?
+
+. Click on the code block
+. Notice it gets copied to the editor above ↑
+. Click the editor's play button to execute
+. Wait for the query to finish
+
+[source,pre-scrollable,code,runnable]
+----
+// Users tweeting with your top hashtags
+MATCH
+  (me:User:Me)-[:POSTS]->(tweet:Tweet)-[:TAGS]->(ht)
+MATCH
+  (ht)<-[:TAGS]-(tweet2:Tweet)<-[:POSTS]-(sugg:User)
+WHERE
+  sugg <> me
+  AND NOT
+  (tweet2)-[:RETWEETS]->(tweet)
+WITH
+  sugg, collect(distinct(ht)) as tags
+RETURN
+  sugg.screen_name as friend, size(tags) as common
+ORDER BY
+  common DESC
+LIMIT 20
+----
+
+== Next steps
+
+* Getting Started with Neo4j
+* http://neo4j.com/download[Download Neo4j]
+
+== More code
+
+* Movie Graph - Movies and actors
+* Northwind Graph - from RDBMS to graph
+* Query Templates - common ad-hoc queries
+* Cypher - query language fundamentals
+
+== Reference
+
+* http://neo4j.com/developer[Developer resources]
+* http://neo4j.com/docs/%7B%7Bneo4j.version%20%7C%20neo4jdoc%20%7D%7D/[Neo4j
+Manual]

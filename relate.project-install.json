@@ -1,0 +1,14 @@
+{
+    "name": "twitter",
+    "description":"Explore a social network with Neo4j's Twitter data",
+    "dbms": [
+      {
+          "dumpFile": "data/twitter-35.dump",
+          "targetNeo4jVersion":"3.5"
+      },
+      {
+          "dumpFile": "data/twitter-40.dump",
+          "targetNeo4jVersion": "^4.0"
+      }
+  ]
+}

@@ -1,0 +1,264 @@
+<article class="guide">
+  <carousel class="deck container-fluid">
+    <slide class="row-fluid">
+      <div class="col-sm-3">
+        <h3>Twitter Graph</h3>
+        <p class="lead">Show data from your personal Twitter account</p>
+      </div>
+      <div class="col-sm-6">
+        <p><em>The Graph Your Network</em>&nbsp;application inserts your Twitter activity into Neo4j.</p>
+        <p>Here is a data model of the graph:<img src="//neo4jsandbox.com/guides/twitter/img/twitter-data-model.svg" class="img-responsive"></p>
+      </div>
+      <div class="col-sm-3"><img src="https://guides.neo4j.com/sandbox/twitter/images/click-next.png" style="position:relative;right:-23px" class="pull-right"></div>
+    </slide>
+    <slide class="row-fluid">
+      <div class="col-sm-3">
+        <h3>Twitter Graph</h3>
+        <p class="lead">Show data from your personal Twitter account</p>
+      </div>
+      <div class="col-sm-9">
+        <p><em>The Graph Your Network</em>&nbsp;application inserts your Twitter activity into Neo4j.</p>
+        <p>This application allows you to query things like:</p>
+        <ol class="big">
+          <li>Who's mentioning you on Twitter</li>
+          <li>Who are your most influential followers?</li>
+          <li>What tags you use frequently</li>
+          <li>How many people you follow also follow you back</li>
+          <li>People tweeting about you, but you don't follow</li>
+          <li>Links from intresting retweets</li>
+          <li>Other people tweeting with some of your top hashtags</li>
+        </ol>
+      </div>
+    </slide>
+    <slide class="row-fluid">
+      <div class="col-sm-3">
+        <h5>Twitter Graph</h5><br>
+        <h3>Your mentions</h3>
+        <p>
+          To the right is a giant code block containing a single Cypher query statement
+          to determine who's mentioning you on Twitter.
+        </p>
+        <ol>
+          <li>Click on the code blocks</li>
+          <li>Notice they get copied to the editor above &uarr;</li>
+          <li>Click the editor's play button to execute</li>
+          <li>Wait for the query to finish</li>
+        </ol>
+      </div>
+      <div class="col-sm-9">
+        <h5>Graph of some of your mentions</h5>
+        <figure>
+          <pre class="pre-scrollable code runnable">// Graph of some of your mentions
+MATCH
+  (u:Me:User)-[p:POSTS]-&gt;(t:Tweet)-[:MENTIONS]-&gt;(m:User)
+WITH
+  u,p,t,m, COUNT(m.screen_name) AS count
+ORDER BY 
+  count DESC
+RETURN
+  u,p,t,m
+LIMIT 10</pre>
+        </figure>
+        <h5>Details as a table</h5>
+        <figure>
+          <pre class="pre-scrollable code runnable">// Detailed table of some of your mentions
+MATCH
+  (u:User:Me)-[:POSTS]-&gt;(t:Tweet)-[:MENTIONS]-&gt;(m:User)
+RETURN
+  m.screen_name AS screen_name, COUNT(m.screen_name) AS count 
+ORDER BY 
+  count DESC
+LIMIT 10</pre>
+        </figure>
+      </div>
+    </slide>
+    <slide class="row-fluid">
+      <div class="col-sm-3">
+        <h5>Twitter Graph</h5><br>
+        <h3>Most Influential Followers</h3>
+        <p>Who are your most influential followers?</p>
+        <ol>
+          <li>Click on the code block</li>
+          <li>Notice it gets copied to the editor above &uarr;</li>
+          <li>Click the editor's play button to execute</li>
+          <li>Wait for the query to finish</li>
+        </ol>
+      </div>
+      <div class="col-sm-9">
+        <figure>
+          <pre class="pre-scrollable code runnable">// Most influential followers
+MATCH 
+  (follower:User)-[:FOLLOWS]-&gt;(u:User:Me)
+RETURN 
+  follower.screen_name AS user, follower.followers AS followers
+ORDER BY
+  followers DESC
+LIMIT 10</pre>
+        </figure>
+      </div>
+    </slide>
+    <slide class="row-fluid">
+      <div class="col-sm-3">
+        <h5>Twitter Graph</h5><br>
+        <h3>Most Tagged</h3>
+        <p>What hashtags have you used most often?</p>
+        <ol>
+          <li>Click on the code block</li>
+          <li>Notice it gets copied to the editor above &uarr;</li>
+          <li>Click the editor's play button to execute</li>
+          <li>Wait for the query to finish</li>
+        </ol>
+      </div>
+      <div class="col-sm-9">
+        <figure>
+          <pre class="pre-scrollable code runnable">// The hashtags you have used most often
+MATCH
+  (h:Hashtag)&lt;-[:TAGS]-(t:Tweet)&lt;-[:POSTS]-(u:User:Me)
+WITH 
+  h, COUNT(h) AS Hashtags
+ORDER BY 
+  Hashtags DESC
+LIMIT 10
+RETURN 
+  h.name, Hashtags</pre>
+        </figure>
+      </div>
+    </slide>
+    <slide class="row-fluid">
+      <div class="col-sm-3">
+        <h5>Twitter Graph</h5><br>
+        <h3>Followback Rate</h3>
+        <p>At what rate do people you follow also follow you back?</p>
+        <ol>
+          <li>Click on the code block</li>
+          <li>Notice it gets copied to the editor above &uarr;</li>
+          <li>Click the editor's play button to execute</li>
+          <li>Wait for the query to finish</li>
+        </ol>
+      </div>
+      <div class="col-sm-9">
+        <figure>
+          <pre class="pre-scrollable code runnable">// Followback rate
+MATCH 
+  (me:User:Me)-[:FOLLOWS]-&gt;(f)
+WITH 
+  me, f, size((f)-[:FOLLOWS]-&gt;(me)) as doesFollowBack
+RETURN
+  SUM(doesFollowBack) / toFloat(COUNT(f))  AS followBackRate</pre>
+        </figure>
+      </div>
+    </slide>
+    <slide class="row-fluid">
+      <div class="col-sm-3">
+        <h5>Twitter Graph</h5><br>
+        <h3>Follower Recommendations</h3>
+        <p>Who tweets about you, but you do not follow?</p>
+        <ol>
+          <li>Click on the code block</li>
+          <li>Notice it gets copied to the editor above &uarr;</li>
+          <li>Click the editor's play button to execute</li>
+          <li>Wait for the query to finish</li>
+        </ol>
+      </div>
+      <div class="col-sm-9">
+        <figure>
+          <pre class="pre-scrollable code runnable">// Follower Recommendations - tweeting about you, but you don't follow
+MATCH 
+  (ou:User)-[:POSTS]-&gt;(t:Tweet)-[mt:MENTIONS]-&gt;(me:User:Me)
+WITH 
+  DISTINCT ou, me
+WHERE
+  (ou)-[:FOLLOWS]-&gt;(me)
+  AND NOT 
+    (me)-[:FOLLOWS]-&gt;(ou)
+RETURN 
+  ou.screen_name</pre>
+        </figure>
+      </div>
+    </slide>
+    <slide class="row-fluid">
+      <div class="col-sm-3">
+        <h5>Twitter Graph</h5><br>
+        <h3>Links from interesting retweets</h3>
+        <p>What links do you retweet, and how often are they favorited?</p>
+        <ol>
+          <li>Click on the code block</li>
+          <li>Notice it gets copied to the editor above &uarr;</li>
+          <li>Click the editor's play button to execute</li>
+          <li>Wait for the query to finish</li>
+        </ol>
+      </div>
+      <div class="col-sm-9">
+        <figure>
+          <pre class="pre-scrollable code runnable">// Links from interesting retweets
+MATCH
+  (:User:Me)-[:POSTS]-&gt;
+  (t:Tweet)-[:RETWEETS]-&gt;(rt)-[:CONTAINS]-&gt;(link:Link)
+RETURN
+  t.id_str AS tweet, link.url AS url, rt.favorites AS favorites
+ORDER BY
+  favorites DESC
+LIMIT 10</pre>
+        </figure>
+      </div>
+    </slide>
+    <slide class="row-fluid">
+      <div class="col-sm-3">
+        <h5>Twitter Graph</h5><br>
+        <h3>Common Hashtags</h3>
+        <p>What users tweet with some of your top hashtags?</p>
+        <ol>
+          <li>Click on the code block</li>
+          <li>Notice it gets copied to the editor above &uarr;</li>
+          <li>Click the editor's play button to execute</li>
+          <li>Wait for the query to finish</li>
+        </ol>
+      </div>
+      <div class="col-sm-9">
+        <figure>
+          <pre class="pre-scrollable code runnable">// Users tweeting with your top hashtags
+MATCH
+  (me:User:Me)-[:POSTS]-&gt;(tweet:Tweet)-[:TAGS]-&gt;(ht)
+MATCH
+  (ht)&lt;-[:TAGS]-(tweet2:Tweet)&lt;-[:POSTS]-(sugg:User)
+WHERE
+  sugg &lt;&gt; me
+  AND NOT
+  (tweet2)-[:RETWEETS]-&gt;(tweet)
+WITH
+  sugg, collect(distinct(ht)) as tags
+RETURN
+  sugg.screen_name as friend, size(tags) as common
+ORDER BY
+  common DESC
+LIMIT 20</pre>
+        </figure>
+      </div>
+    </slide>
+    <slide class="row-fluid header">
+      <div class="col-sm-4">
+        <h3>Next steps</h3>
+        <ul class="undecorated">
+          <li><a play-topic="start">Getting Started with Neo4j</a></li>
+          <li><a href="http://neo4j.com/download">Download Neo4j</a></li>
+        </ul>
+      </div>
+      <div class="col-sm-4">
+        <h3>More code</h3>
+        <ul class="undecorated">
+          <li><a play-topic="movie-graph">Movie Graph</a> - Movies and actors</li>
+          <li><a play-topic="northwind-graph">Northwind Graph</a> - from RDBMS to graph</li>
+          <li><a play-topic="query-template">Query Templates</a> - common ad-hoc queries</li>
+          <li><a play-topic="cypher">Cypher</a> - query language fundamentals</li>
+        </ul>
+      </div>
+      <div class="col-sm-4">
+        <h3>Reference</h3>
+        <ul class="undecorated">
+          <li><a href="http://neo4j.com/developer">Developer resources</a></li>
+          <li><a href="http://neo4j.com/docs/{{neo4j.version | neo4jdoc }}/">Neo4j Manual</a></li>
+        </ul>
+      </div>
+    </slide>
+  </carousel>
+</article>
