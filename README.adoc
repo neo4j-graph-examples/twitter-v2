@@ -10,14 +10,14 @@
 :use-dump-file: data/twitter-40.dump
 :zip-file: false
 :use-plugin: false
-:target-db-version: 3.5,4.0
+:target-db-version: 4.0
 :bloom-perspective: bloom/twitter.bloom-perspective
 :guide: documentation/twitter.neo4j-browser-guide
 :rendered-guide: https://guides.neo4j.com/sandbox/{name}/index.html
 :model: documentation/img/model.png
 :example: documentation/img/example.png
 
-:todo: Update images, example query, bloom perspective
+:todo: false
 image::{icon}[width=100]
 
 == {long-name} Graph Example
@@ -35,10 +35,10 @@ image::{model}[]
 image::{example}[width=600]
 
 .Example Query:
-[source,cypher,role=query-example,param-name=location,param-value='Iceland, Rekjavik',result-column=ip,expected-result=10.0.0.254]
+[source,cypher,role=query-example,param-name=screenName,param-value=NASA,result-column=hashtag,expected-result=earthlings]
 ----
-MATCH (dc:DataCenter {location: $location})-[:CONTAINS]->(r:Router)-[:ROUTES]->(i:Interface)
-RETURN i.ip as ip
+MATCH (u:User {screen_name: $screenName})<-[r:MENTIONS]-(t:Tweet)-[r2:TAGS]->(h:Hashtag)
+RETURN h.name as hashtag
 ----
 
 === Setup
