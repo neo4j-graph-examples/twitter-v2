@@ -115,7 +115,7 @@ extend type Me {
       WHERE (u)-[:FOLLOWS]->(me)
       AND NOT (me)-[:FOLLOWS]->(u)
       RETURN { 
-        user: m { .* }, 
+        user: u { .* }, 
         count: count 
       }
       ORDER BY count DESC
