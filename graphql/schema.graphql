@@ -80,10 +80,9 @@ extend type Me {
       WITH m, COUNT(m.screen_name) AS count 
       ORDER BY count DESC
       LIMIT $first
-      RETURN {
-        screen_name: m.screen_name,
-        name: m.name,
-        count: count
+      RETURN { 
+        user: m { .* }, 
+        count: count 
       }
       """
     )
@@ -115,10 +114,9 @@ extend type Me {
       WITH DISTINCT u, me, count(t) as count
       WHERE (u)-[:FOLLOWS]->(me)
       AND NOT (me)-[:FOLLOWS]->(u)
-      RETURN {
-        screen_name: u.screen_name,
-        name: u.name,
-        count: count
+      RETURN { 
+        user: m { .* }, 
+        count: count 
       }
       ORDER BY count DESC
       LIMIT $first
