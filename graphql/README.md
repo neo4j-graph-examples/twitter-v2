@@ -1,10 +1,10 @@
-[![Open in CodeSandbox](https://img.shields.io/badge/Open%20in-CodeSandbox-blue?style=flat-square&logo=codesandbox)](https://codesandbox.io/s/github/neo4j-graph-examples/twitter/tree/main/graphql?file=/schema.graphql)
+[![Open in CodeSandbox](https://img.shields.io/badge/Open%20in-CodeSandbox-blue?style=flat-square&logo=codesandbox)](https://codesandbox.io/s/github/neo4j-graph-examples/twitter-v2/tree/main/graphql?file=/schema.graphql)
 
 # GraphQL API
 
 This directory contains a Node.js GraphQL API application using [`@neo4j/graphql`](https://www.npmjs.com/package/@neo4j/graphql).
 
-Try it live on CodeSandbox [here](https://codesandbox.io/s/github/neo4j-graph-examples/twitter/tree/main/graphql?file=/schema.graphql)
+Try it live on CodeSandbox [here](https://codesandbox.io/s/github/neo4j-graph-examples/twitter-v2/tree/main/graphql?file=/schema.graphql)
 
 ## Setup
 
