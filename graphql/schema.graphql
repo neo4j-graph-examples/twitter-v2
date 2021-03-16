@@ -68,7 +68,7 @@ type UserTweet {
    screen_name: String
    name: String
    profile_pic: String
-   createdDatetime: DateTime
+   created_at: DateTime
    text: String
 }
 
@@ -145,36 +145,40 @@ extend type Tweet {
   priorityFeed: [UserTweet]
     @cypher(
       statement: """
+      MATCH (t:Tweet) WHERE t.created_at IS NOT NULL
+      WITH max(t.created_at) as latestDate
       MATCH (u:User)-[r:SIMILAR_TO]-(:Me)
-      WITH u
+      WITH u, latestDate
       ORDER BY r.score DESC
       LIMIT 10
       MATCH (u)-[:POSTS]->(t:Tweet)
-      WHERE t.createdDatetime >= datetime() - duration("P10D")
+      WHERE t.created_at >= latestDate - duration('P2D')
       WITH u, t
-      ORDER BY t.createdDatetime DESC
+      ORDER BY t.created_at DESC
       LIMIT 50
       RETURN {
         screen_name: u.screen_name,
         name: u.name,
         profile_pic: u.profile_image_url,
-        createdDatetime: t.createdDatetime,
+        created_at: t.created_at,
         text: t.text
       }
       UNION
+      MATCH (t:Tweet) WHERE t.created_at IS NOT NULL
+      WITH max(t.created_at) as latestDate
       MATCH (u:User)-[r:POSTS]->(t:Tweet)
-      WHERE t.createdDatetime >= datetime() - duration("P10D") AND NOT u:Me
+      WHERE t.created_at >= latestDate - duration('P2D') AND NOT u:Me
       WITH u, t 
-      ORDER BY t.createdDatetime DESC
+      ORDER BY t.created_at DESC
       LIMIT 50
       RETURN {
         screen_name: u.screen_name,
         name: u.name,
         profile_pic: u.profile_image_url,
-        createdDatetime: t.createdDatetime,
+        created_at: t.created_at,
         text: t.text
       }
-      ORDER BY t.createdDatetime DESC
+      ORDER BY t.created_at DESC
       LIMIT 50
       """
     )
