@@ -122,6 +122,49 @@ extend type Me {
       LIMIT $first
       """
     )
+    priorityFeed: [UserTweet]
+    @cypher(
+      statement: """
+      MATCH (t:Tweet) WHERE t.created_at IS NOT NULL
+      WITH max(t.created_at) as latestDate
+      CALL {
+        WITH latestDate
+        MATCH (this:Me)-[r:SIMILAR_TO]-(u:User)
+        WITH u, latestDate
+        ORDER BY r.score DESC
+        LIMIT 10
+        MATCH (u)-[:POSTS]->(t:Tweet)
+        WHERE t.created_at >= latestDate - duration('P1D')
+        WITH u, t
+        ORDER BY t.created_at DESC
+        LIMIT 50
+        RETURN {
+          screen_name: u.screen_name,
+          name: u.name,
+          profile_pic: u.profile_image_url,
+          created_at: t.created_at,
+          text: t.text
+        } as tweets
+        UNION
+        WITH latestDate
+        MATCH (u:User)-[r:POSTS]->(t:Tweet)
+        WHERE t.created_at >= latestDate - duration('P1D') AND NOT u:Me
+        WITH u, t 
+        ORDER BY t.created_at DESC
+        LIMIT 50
+        RETURN {
+          screen_name: u.screen_name,
+          name: u.name,
+          profile_pic: u.profile_image_url,
+          created_at: t.created_at,
+          text: t.text
+        } as tweets
+        ORDER BY t.created_at DESC
+        LIMIT 50
+      }
+      RETURN tweets
+      """
+    )
 }
 
 extend type User {
@@ -142,46 +185,6 @@ extend type User {
 
 extend type Tweet {
   mentions: [User] @relationship(type: "MENTIONS", direction: "OUT")
-  priorityFeed: [UserTweet]
-    @cypher(
-      statement: """
-      MATCH (t:Tweet) WHERE t.created_at IS NOT NULL
-      WITH max(t.created_at) as latestDate
-      MATCH (u:User)-[r:SIMILAR_TO]-(:Me)
-      WITH u, latestDate
-      ORDER BY r.score DESC
-      LIMIT 10
-      MATCH (u)-[:POSTS]->(t:Tweet)
-      WHERE t.created_at >= latestDate - duration('P2D')
-      WITH u, t
-      ORDER BY t.created_at DESC
-      LIMIT 50
-      RETURN {
-        screen_name: u.screen_name,
-        name: u.name,
-        profile_pic: u.profile_image_url,
-        created_at: t.created_at,
-        text: t.text
-      }
-      UNION
-      MATCH (t:Tweet) WHERE t.created_at IS NOT NULL
-      WITH max(t.created_at) as latestDate
-      MATCH (u:User)-[r:POSTS]->(t:Tweet)
-      WHERE t.created_at >= latestDate - duration('P2D') AND NOT u:Me
-      WITH u, t 
-      ORDER BY t.created_at DESC
-      LIMIT 50
-      RETURN {
-        screen_name: u.screen_name,
-        name: u.name,
-        profile_pic: u.profile_image_url,
-        created_at: t.created_at,
-        text: t.text
-      }
-      ORDER BY t.created_at DESC
-      LIMIT 50
-      """
-    )
 }
 
 extend type Hashtag {
