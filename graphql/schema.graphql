@@ -126,15 +126,15 @@ extend type Me {
     @cypher(
       statement: """
       MATCH (t:Tweet) WHERE t.created_at IS NOT NULL
-      WITH max(t.created_at) as latestDate
+      WITH max(t.created_at) - duration('P2D') as recentDate
       CALL {
-        WITH latestDate
+        WITH recentDate
         MATCH (this:Me)-[r:SIMILAR_TO]-(u:User)
-        WITH u, latestDate
+        WITH u, recentDate
         ORDER BY r.score DESC
         LIMIT 10
         MATCH (u)-[:POSTS]->(t:Tweet)
-        WHERE t.created_at >= latestDate - duration('P1D')
+        WHERE t.created_at >= recentDate
         WITH u, t
         ORDER BY t.created_at DESC
         LIMIT 50
@@ -146,10 +146,10 @@ extend type Me {
           text: t.text
         } as tweets
         UNION
-        WITH latestDate
+        WITH recentDate
         MATCH (u:User)-[r:POSTS]->(t:Tweet)
-        WHERE t.created_at >= latestDate - duration('P1D') AND NOT u:Me
-        WITH u, t 
+        WHERE t.created_at >= recentDate AND NOT u:Me
+        WITH u, t
         ORDER BY t.created_at DESC
         LIMIT 50
         RETURN {
