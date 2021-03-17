@@ -126,7 +126,7 @@ extend type Me {
     @cypher(
       statement: """
       MATCH (t:Tweet) WHERE t.created_at IS NOT NULL
-      WITH max(t.created_at) - duration('P2D') as recentDate
+      WITH max(t.created_at) - duration('P3D') as recentDate
       CALL {
         WITH recentDate
         MATCH (this:Me)-[r:SIMILAR_TO]-(u:User)
