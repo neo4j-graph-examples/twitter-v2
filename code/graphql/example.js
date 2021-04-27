@@ -15,12 +15,12 @@ const typeDefs = /* GraphQL */ `
     id_str: String
     import_method: String
     text: String
-    using: [Source] @relationship(type: "USING", direction: "OUT")
-    tags: [Hashtag] @relationship(type: "TAGS", direction: "OUT")
-    retweets: [Tweet] @relationship(type: "RETWEETS", direction: "OUT")
-    reply_to: [Tweet] @relationship(type: "REPLY_TO", direction: "OUT")
-    contains: [Link] @relationship(type: "CONTAINS", direction: "OUT")
-    posted_by: User @relationship(type: "POSTS", direction: "IN")
+    using: [Source] @relationship(type: "USING", direction: OUT)
+    tags: [Hashtag] @relationship(type: "TAGS", direction: OUT)
+    retweets: [Tweet] @relationship(type: "RETWEETS", direction: OUT)
+    reply_to: [Tweet] @relationship(type: "REPLY_TO", direction: OUT)
+    contains: [Link] @relationship(type: "CONTAINS", direction: OUT)
+    posted_by: User @relationship(type: "POSTS", direction: IN)
   }
 
   type Me {
@@ -30,26 +30,26 @@ const typeDefs = /* GraphQL */ `
     name: String!
     profile_image_url: String!
     screen_name: ID!
-    posts: [Tweet] @relationship(type: "POSTS", direction: "OUT")
-    users: [User] @relationship(type: "FOLLOWS", direction: "IN")
-    tweets: [Tweet] @relationship(type: "MENTIONS", direction: "IN")
+    posts: [Tweet] @relationship(type: "POSTS", direction: OUT)
+    users: [User] @relationship(type: "FOLLOWS", direction: IN)
+    tweets: [Tweet] @relationship(type: "MENTIONS", direction: IN)
   }
 
   type Hashtag {
     name: String!
-    tweets: [Tweet] @relationship(type: "TAGS", direction: "IN")
+    tweets: [Tweet] @relationship(type: "TAGS", direction: IN)
     num_tweets: Int
       @cypher(statement: "RETURN SIZE( (this)<-[:TAGS]-(:Tweet) )")
   }
 
   type Link {
     url: String!
-    tweets: [Tweet] @relationship(type: "CONTAINS", direction: "IN")
+    tweets: [Tweet] @relationship(type: "CONTAINS", direction: IN)
   }
 
   type Source {
     name: String!
-    tweets: [Tweet] @relationship(type: "USING", direction: "IN")
+    tweets: [Tweet] @relationship(type: "USING", direction: IN)
   }
 
   type User {
@@ -61,8 +61,8 @@ const typeDefs = /* GraphQL */ `
     screen_name: String!
     statuses: Int
     url: String
-    posts: [Tweet] @relationship(type: "POSTS", direction: "OUT")
-    tweets: [Tweet] @relationship(type: "MENTIONS", direction: "IN")
+    posts: [Tweet] @relationship(type: "POSTS", direction: OUT)
+    tweets: [Tweet] @relationship(type: "MENTIONS", direction: IN)
   }
 
   type UserCount {
@@ -87,7 +87,7 @@ const typeDefs = /* GraphQL */ `
   }
 
   extend type Tweet {
-    mentions: [User] @relationship(type: "MENTIONS", direction: "OUT")
+    mentions: [User] @relationship(type: "MENTIONS", direction: OUT)
   }
 `;
 
