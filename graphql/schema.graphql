@@ -59,6 +59,114 @@ type UserCount {
   user: User
 }
 
+type HashtagCount {
+    count: Int
+    name: String
+}
+
+type UserTweet {
+   screen_name: String
+   name: String
+   profile_pic: String
+   created_at: DateTime
+   text: String
+}
+
+extend type Me {
+   topMentions(first: Int = 5): [UserCount] 
+    @cypher(
+      statement: """
+      MATCH (this)-[:POSTS]->(t:Tweet)-[:MENTIONS]->(m:User)
+      WITH m, COUNT(m.screen_name) AS count 
+      ORDER BY count DESC
+      LIMIT $first
+      RETURN { 
+        user: m { .* }, 
+        count: count 
+      }
+      """
+    )
+   topHashtags(first: Int = 5): [HashtagCount]
+    @cypher(
+      statement: """
+      MATCH (this:Me)-[:POSTS]->(t:Tweet)-[:TAGS]->(h:Hashtag)
+      WITH h, COUNT(h) AS count
+      ORDER BY count DESC
+      LIMIT $first
+      RETURN {
+        name: h.name,
+        count: count
+      }
+      """
+    )
+   followbackCount: Int
+    @cypher(
+      statement: """
+      MATCH (me:Me)-[:FOLLOWS]->(f:User)
+      WHERE (f)-[:FOLLOWS]->(me)
+      RETURN count(f)
+      """
+    )
+   recommended(first: Int = 10): [UserCount]
+    @cypher(
+      statement: """
+      MATCH (u:User)-[:POSTS]->(t:Tweet)-[:MENTIONS]->(me:Me)
+      WITH DISTINCT u, me, count(t) as count
+      WHERE (u)-[:FOLLOWS]->(me)
+      AND NOT (me)-[:FOLLOWS]->(u)
+      RETURN { 
+        user: u { .* }, 
+        count: count 
+      }
+      ORDER BY count DESC
+      LIMIT $first
+      """
+    )
+    priorityFeed: [UserTweet]
+    @cypher(
+      statement: """
+      MATCH (t:Tweet) WHERE t.created_at IS NOT NULL
+      WITH max(t.created_at) - duration('P3D') as recentDate
+      CALL {
+        WITH recentDate
+        MATCH (this:Me)-[r:SIMILAR_TO]-(u:User)
+        WITH u, recentDate
+        ORDER BY r.score DESC
+        LIMIT 10
+        MATCH (u)-[:POSTS]->(t:Tweet)
+        WHERE t.created_at >= recentDate
+        WITH u, t
+        ORDER BY t.created_at DESC
+        LIMIT 50
+        RETURN {
+          screen_name: u.screen_name,
+          name: u.name,
+          profile_pic: u.profile_image_url,
+          created_at: t.created_at,
+          text: t.text
+        } as tweets
+        UNION
+        WITH recentDate
+        MATCH (u:User)-[r:POSTS]->(t:Tweet)
+        WHERE t.created_at >= recentDate AND NOT u:Me
+        WITH u, t
+        ORDER BY t.created_at DESC
+        LIMIT 50
+        RETURN {
+          screen_name: u.screen_name,
+          name: u.name,
+          profile_pic: u.profile_image_url,
+          created_at: t.created_at,
+          text: t.text
+        } as tweets
+        ORDER BY t.created_at DESC
+        LIMIT 50
+      }
+      RETURN tweets
+      """
+    )
+}
+
 extend type User {
   topMentions: UserCount
     @cypher(
@@ -77,4 +185,20 @@ extend type User {
 
 extend type Tweet {
   mentions: [User] @relationship(type: "MENTIONS", direction: OUT)
+}
+
+extend type Hashtag {
+    trendingTags(first: Int = 5): [HashtagCount]
+      @cypher(
+        statement: """
+        MATCH (t:Tweet)-[:TAGS]->(h:Hashtag)
+        WITH h, count(h) as count
+        ORDER BY count DESC
+        LIMIT $first
+        RETURN {
+          name: h.name,
+          count: count
+        }
+        """
+      )
 }

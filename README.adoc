@@ -4,7 +4,7 @@
 :icon: documentation/img/twitter.svg
 :tags: example-data,dataset,twitter-data,social-network,social-media,user-data
 :author: Jennifer Reif
-:demodb: false
+:demodb: true
 :data: false
 :use-load-script: false
 :use-dump-file: data/twitter-40.dump
