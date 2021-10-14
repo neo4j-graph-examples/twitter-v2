@@ -4,11 +4,13 @@
     "dbms": [
       {
           "dumpFile": "data/twitter-v2-40.dump",
-          "targetNeo4jVersion": "4.0.* - 4.2.*"
+          "targetNeo4jVersion": "4.0.* - 4.2.*",
+          "plugins": ["apoc", "graph-data-science"]
       },
       {
           "dumpFile": "data/twitter-v2-43.dump",
-          "targetNeo4jVersion": "^4.3"
+          "targetNeo4jVersion": "^4.3",
+          "plugins": ["apoc", "graph-data-science"]
       }
   ]
 }
