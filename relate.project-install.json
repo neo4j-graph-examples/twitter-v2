@@ -2,15 +2,20 @@
     "name": "twitter",
     "description":"Explore a social network with Neo4j's Twitter data",
     "dbms": [
-      {
-          "dumpFile": "data/twitter-v2-40.dump",
-          "targetNeo4jVersion": "4.0.* - 4.2.*",
-          "plugins": ["apoc", "graph-data-science"]
-      },
-      {
-          "dumpFile": "data/twitter-v2-43.dump",
-          "targetNeo4jVersion": "^4.3",
-          "plugins": ["apoc", "graph-data-science"]
-      }
-  ]
+        {
+            "dumpFile": "data/twitter-v2-40.dump",
+            "targetNeo4jVersion": ">=4.0.0 <4.3.0",
+            "plugins": ["apoc"]
+        },
+        {
+            "dumpFile": "data/twitter-v2-43.dump",
+            "targetNeo4jVersion": ">=4.3.0 <5.0.0",
+            "plugins": ["apoc"]
+        },
+        {
+            "dumpFile": "data/twitter-v2-50.dump",
+            "targetNeo4jVersion": ">=5.0.0 <6.0.0",
+            "plugins": ["apoc"]
+        }
+    ]
 }

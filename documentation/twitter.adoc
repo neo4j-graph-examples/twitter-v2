@@ -41,7 +41,7 @@ statement to determine who's mentioning you on Twitter.
 
 == Graph of some of your mentions
 
-[source,pre-scrollable,code,runnable]
+[source,cypher]
 ----
 // Graph of some of your mentions
 MATCH
@@ -57,7 +57,7 @@ LIMIT 10
 
 == Details as a table
 
-[source,pre-scrollable,code,runnable]
+[source,cypher]
 ----
 // Detailed table of some of your mentions
 MATCH
@@ -80,7 +80,7 @@ Who are your most influential followers?
 . Click the editor's play button to execute
 . Wait for the query to finish
 
-[source,pre-scrollable,code,runnable]
+[source,cypher]
 ----
 // Most influential followers
 MATCH 
@@ -103,7 +103,7 @@ What hashtags have you used most often?
 . Click the editor's play button to execute
 . Wait for the query to finish
 
-[source,pre-scrollable,code,runnable]
+[source,cypher]
 ----
 // The hashtags you have used most often
 MATCH
@@ -128,7 +128,7 @@ At what rate do people you follow also follow you back?
 . Click the editor's play button to execute
 . Wait for the query to finish
 
-[source,pre-scrollable,code,runnable]
+[source,cypher]
 ----
 // Followback rate
 MATCH 
@@ -150,7 +150,7 @@ Who tweets about you, but you do not follow?
 . Click the editor's play button to execute
 . Wait for the query to finish
 
-[source,pre-scrollable,code,runnable]
+[source,cypher]
 ----
 // Follower Recommendations - tweeting about you, but you don't follow
 MATCH 
@@ -176,7 +176,7 @@ What links do you retweet, and how often are they favorited?
 . Click the editor's play button to execute
 . Wait for the query to finish
 
-[source,pre-scrollable,code,runnable]
+[source,cypher]
 ----
 // Links from interesting retweets
 MATCH
@@ -200,7 +200,7 @@ What users tweet with some of your top hashtags?
 . Click the editor's play button to execute
 . Wait for the query to finish
 
-[source,pre-scrollable,code,runnable]
+[source,cypher]
 ----
 // Users tweeting with your top hashtags
 MATCH
